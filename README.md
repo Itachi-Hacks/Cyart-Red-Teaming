@@ -62,33 +62,35 @@ Wazuh generated alerts, Suricata captured suspicious traffic, and CrowdSec autom
 
 Architecture Diagram
 
-                  ┌──────────────────┐
-                  │  Kali Attacker   │
-                  │   172.20.10.4    │
-                  └───────┬──────────┘
-                          │
-                   NTLM Logon Attempts
-                          │
-        ┌──────────────────┴────────────────────┐
-        │                                       │
+
+┌──────────────────┐
+│  Kali Attacker   │
+│   172.20.10.4    │
+└───────┬──────────┘
+        │
+ NTLM Logon Attempts
+        │
+┌──────────────────┴────────────────────┐
+│                                       │
 ┌─────────────────┐                    ┌────────────────────┐
 │ Windows 10 Host │                    │ Windows Server 2019│
 │ WINDOWS10PROOO  │                    │ WINDOWS19PROOO     │
 └─────────┬───────┘                    └─────────┬──────────┘
-          │                                      │
-          └──────────────┬──────────────────────┘
-                         Log Forwarding to Wazuh
-                                │
-                         ┌──────▼────────┐
-                         │   Wazuh SIEM  │
-                         │ Detection & IR│
-                         └──────┬────────┘
-                                │
-                                ▼
-                        ┌───────────────┐
-                        │   CrowdSec    │
-                        │ Auto-Blocking │
-                        └───────────────┘
+        │                                      │
+        └──────────────┬──────────────────────┘
+                       Log Forwarding to Wazuh
+                              │
+                       ┌──────▼────────┐
+                       │   Wazuh SIEM  │
+                       │ Detection & IR│
+                       └──────┬────────┘
+                              │
+                              ▼
+                      ┌───────────────┐
+                      │   CrowdSec    │
+                      │ Auto-Blocking │
+                      └───────────────┘
+
 
 🧠 Key Findings
 ✔ Multiple NTLM Network Logon (Type 3) attempts
