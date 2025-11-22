@@ -1,0 +1,105 @@
+<mxfile host="app.diagrams.net">
+    <diagram name="Page-1" id="2cc2d294-239b-6884-1246-5566c0b8a5fe">
+        <mxGraphModel dx="1426" dy="881" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                
+                <!-- Kali Attacker -->
+                <mxCell id="2" value="Kali Attacker" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+                    <mxGeometry x="350" y="40" width="120" height="60"/>
+                </mxCell>
+                <mxCell id="3" value="172.20.10.4" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="350" y="100" width="120" height="20"/>
+                </mxCell>
+                
+                <!-- NTLM Label -->
+                <mxCell id="4" value="NTLM Logon Attempts" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="340" y="130" width="140" height="20"/>
+                </mxCell>
+                
+                <!-- Arrow from Kali to Windows systems -->
+                <mxCell id="5" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="2" target="7">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="410" y="100" as="sourcePoint"/>
+                        <mxPoint x="410" y="220" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                
+                <!-- Windows 10 Host -->
+                <mxCell id="7" value="Windows 10 Host" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+                    <mxGeometry x="200" y="220" width="120" height="60"/>
+                </mxCell>
+                <mxCell id="8" value="WINDOWS10PROOO" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="200" y="280" width="120" height="20"/>
+                </mxCell>
+                
+                <!-- Windows Server 2019 -->
+                <mxCell id="9" value="Windows Server 2019" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+                    <mxGeometry x="490" y="220" width="120" height="60"/>
+                </mxCell>
+                <mxCell id="10" value="WINDOWS19PROOO" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="490" y="280" width="120" height="20"/>
+                </mxCell>
+                
+                <!-- Arrow from Kali to Server -->
+                <mxCell id="12" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="2" target="9">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="410" y="100" as="sourcePoint"/>
+                        <mxPoint x="550" y="220" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                
+                <!-- Log Forwarding Label -->
+                <mxCell id="13" value="Log Forwarding to Wazuh" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="320" y="320" width="140" height="20"/>
+                </mxCell>
+                
+                <!-- Arrow from Win10 to Wazuh -->
+                <mxCell id="14" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="7" target="17">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="260" y="280" as="sourcePoint"/>
+                        <mxPoint x="350" y="370" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                
+                <!-- Arrow from Server to Wazuh -->
+                <mxCell id="15" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="9" target="17">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="550" y="280" as="sourcePoint"/>
+                        <mxPoint x="470" y="370" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                
+                <!-- Wazuh SIEM -->
+                <mxCell id="17" value="Wazuh SIEM" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+                    <mxGeometry x="350" y="370" width="120" height="60"/>
+                </mxCell>
+                <mxCell id="18" value="Detection &amp; IR" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="350" y="430" width="120" height="20"/>
+                </mxCell>
+                
+                <!-- Arrow from Wazuh to CrowdSec -->
+                <mxCell id="20" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="17" target="21">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="410" y="430" as="sourcePoint"/>
+                        <mxPoint x="410" y="490" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                
+                <!-- CrowdSec -->
+                <mxCell id="21" value="CrowdSec" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+                    <mxGeometry x="350" y="490" width="120" height="60"/>
+                </mxCell>
+                <mxCell id="22" value="Auto-Blocking" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="350" y="550" width="120" height="20"/>
+                </mxCell>
+                
+                <!-- Title -->
+                <mxCell id="23" value="Network Security Monitoring &amp; Automated Response" style="text;html=1;strokeColor=none;fillColor=none;fontSize=18;fontStyle=1;verticalAlign=middle;align=center;" vertex="1" parent="1">
+                    <mxGeometry x="250" y="10" width="320" height="30"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
