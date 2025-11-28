@@ -1,0 +1,21 @@
+The Script
+
+(Call is connected. Tone is professional, calm, and slightly urgent.)
+
+Visher: "Hello, is this [Target's Name]? This is [Visher's Fake Name], calling from the Telco Solutions Security Department. I'm reaching out regarding a critical flag on your account."
+
+(Pause for acknowledgment. If the target is wary, proceed with reassurance.)
+
+Visher: "We've detected an unauthorized attempt to process a device upgrade through your number this afternoon. To prevent any fraudulent activity, we've placed an immediate security hold on the account and are required to verify your identity."
+
+(This creates urgency and a sense of the caller being a protector.)
+
+Visher: "To resolve this, I need to confirm you are the account holder. I will send a One-Time Password to your registered mobile number now. Can you please read that 6-digit code back to me to confirm your identity and cancel this fraudulent request?"
+
+(If the target hesitates or questions the process):
+
+Visher: "I understand your concern, sir/ma'am. This is our standard, real-time verification process to ensure the security of your account. Without this code, we cannot stop the pending upgrade, and you may be liable for the charges."
+
+(The script ends upon successful extraction of the OTP or account details, with a polite sign-off.)
+
+Visher: "Thank you for your cooperation. The fraudulent request has been cancelled, and your account is now secure. You will receive a confirmation text shortly. Have a good day."

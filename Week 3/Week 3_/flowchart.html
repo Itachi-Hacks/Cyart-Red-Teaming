@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Attack Flow Visualization</title>
+    <style>
+        :root {
+            --recon-color: #d5e8d4;
+            --initial-color: #f8cecc;
+            --exploit-color: #ffe6cc;
+            --lateral-color: #dae8fc;
+            --exfil-color: #fff2cc;
+            --persist-color: #e1d5e7;
+            --command-color: #f4cccc;
+            --dark-text: #333;
+            --light-text: #666;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f7fa;
+            color: var(--dark-text);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: var(--light-text);
+            font-size: 1.1em;
+        }
+        
+        .flow-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .phase {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        
+        .phase-content {
+            flex: 1;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .phase-content:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+        
+        .phase-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 8px;
+            height: 100%;
+        }
+        
+        .recon::before { background-color: var(--recon-color); }
+        .initial::before { background-color: var(--initial-color); }
+        .exploit::before { background-color: var(--exploit-color); }
+        .lateral::before { background-color: var(--lateral-color); }
+        .exfil::before { background-color: var(--exfil-color); }
+        .persist::before { background-color: var(--persist-color); }
+        .command::before { background-color: var(--command-color); }
+        
+        .phase-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .phase-icon {
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+        
+        .phase-details {
+            margin-top: 15px;
+        }
+        
+        .tools-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .tool-tag {
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .connector {
+            width: 40px;
+            height: 2px;
+            background-color: #bdc3c7;
+            position: relative;
+            margin: 0 15px;
+        }
+        
+        .connector::after {
+            content: '→';
+            position: absolute;
+            right: -15px;
+            top: -10px;
+            color: #7f8c8d;
+            font-size: 1.2em;
+        }
+        
+        .phase-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #34495e;
+            color: white;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .details-panel {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .details-panel.active {
+            display: block;
+        }
+        
+        .details-title {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .countermeasures {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed #ddd;
+        }
+        
+        .counter-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #e74c3c;
+        }
+        
+        .counter-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .counter-list li {
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .counter-list li::before {
+            content: '🛡️';
+            position: absolute;
+            left: 0;
+        }
+        
+        .indicators {
+            margin-top: 15px;
+        }
+        
+        .indicators-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #3498db;
+        }
+        
+        @media (max-width: 768px) {
+            .phase {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .phase-number {
+                margin-bottom: 10px;
+            }
+            
+            .connector {
+                width: 2px;
+                height: 20px;
+                margin: 5px 0 5px 15px;
+            }
+            
+            .connector::after {
+                content: '↓';
+                right: -8px;
+                top: auto;
+                bottom: -15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Cyber Attack Flow Visualization</h1>
+            <p class="subtitle">Mapping the adversary's path from reconnaissance to data exfiltration</p>
+        </header>
+        
+        <div class="flow-container">
+            <!-- Phase 1: Reconnaissance -->
+            <div class="phase">
+                <div class="phase-number">1</div>
+                <div class="phase-content recon" data-phase="recon">
+                    <div class="phase-title">
+                        <span class="phase-icon">🔍</span>
+                        Reconnaissance
+                    </div>
+                    <p>Gathering information about the target system and identifying potential vulnerabilities.</p>
+                    <div class="phase-details">
+                        <strong>Techniques:</strong> Network scanning, service enumeration, OSINT
+                    </div>
+                    <div class="tools-list">
+                        <span class="tool-tag">Nmap</span>
+                        <span class="tool-tag">Shodan</span>
+                        <span class="tool-tag">theHarvester</span>
+                        <span class="tool-tag">Maltego</span>
+                    </div>
+                </div>
+                <div class="connector"></div>
+            </div>
+            
+            <!-- Phase 2: Initial Access -->
+            <div class="phase">
+                <div class="phase-number">2</div>
+                <div class="phase-content initial" data-phase="initial">
+                    <div class="phase-title">
+                        <span class="phase-icon">🚪</span>
+                        Initial Access
+                    </div>
+                    <p>Gaining initial foothold in the target environment through exploitation or social engineering.</p>
+                    <div class="phase-details">
+                        <strong>Vectors:</strong> Phishing, vulnerable services, stolen credentials
+                    </div>
+                    <div class="tools-list">
+                        <span class="tool-tag">Metasploit</span>
+                        <span class="tool-tag">Cobalt Strike</span>
+                        <span class="tool-tag">Social Engineering</span>
+                    </div>
+                </div>
+                <div class="connector"></div>
+            </div>
+            
+            <!-- Phase 3: Exploitation -->
+            <div class="phase">
+                <div class="phase-number">3</div>
+                <div class="phase-content exploit" data-phase="exploit">
+                    <div class="phase-title">
+                        <span class="phase-icon">💥</span>
+                        Exploitation
+                    </div>
+                    <p>Executing code to leverage vulnerabilities and gain further control of the system.</p>
+                    <div class="phase-details">
+                        <strong>Activities:</strong> Privilege escalation, credential dumping, persistence establishment
+                    </div>
+                    <div class="tools-list">
+                        <span class="tool-tag">Mimikatz</span>
+                        <span class="tool-tag">PowerSploit</span>
+                        <span class="tool-tag">BloodHound</span>
+                        <span class="tool-tag">Hashcat</span>
+                    </div>
+                </div>
+                <div class="connector"></div>
+            </div>
+            
+            <!-- Phase 4: Lateral Movement -->
+            <div class="phase">
+                <div class="phase-number">4</div>
+                <div class="phase-content lateral" data-phase="lateral">
+                    <div class="phase-title">
+                        <span class="phase-icon">🔄</span>
+                        Lateral Movement
+                    </div>
+                    <p>Moving through the network to access additional systems and higher-value targets.</p>
+                    <div class="phase-details">
+                        <strong>Methods:</strong> Pass-the-hash, RDP, WMI, SSH tunneling
+                    </div>
+                    <div class="tools-list">
+                        <span class="tool-tag">pwdump</span>
+                        <span class="tool-tag">CrackMapExec</span>
+                        <span class="tool-tag">PsExec</span>
+                        <span class="tool-tag">RDP</span>
+                    </div>
+                </div>
+                <div class="connector"></div>
+            </div>
+            
+            <!-- Phase 5: Persistence & C2 -->
+            <div class="phase">
+                <div class="phase-number">5</div>
+                <div class="phase-content persist" data-phase="persist">
+                    <div class="phase-title">
+                        <span class="phase-icon">⚙️</span>
+                        Persistence & Command & Control
+                    </div>
+                    <p>Maintaining access and establishing communication channels with compromised systems.</p>
+                    <div class="phase-details">
+                        <strong>Techniques:</strong> Scheduled tasks, service installation, registry modifications
+                    </div>
+                    <div class="tools-list">
+                        <span class="tool-tag">Empire</span>
+                        <span class="tool-tag">Sliver</span>
+                        <span class="tool-tag">Web shells</span>
+                        <span class="tool-tag">DNS tunneling</span>
+                    </div>
+                </div>
+                <div class="connector"></div>
+            </div>
+            
+            <!-- Phase 6: Exfiltration -->
+            <div class="phase">
+                <div class="phase-number">6</div>
+                <div class="phase-content exfil" data-phase="exfil">
+                    <div class="phase-title">
+                        <span class="phase-icon">📤</span>
+                        Exfiltration
+                    </div>
+                    <p>Stealing and transferring data from the target environment to attacker-controlled systems.</p>
+                    <div class="phase-details">
+                        <strong>Methods:</strong> DNS tunneling, HTTPS, FTP, cloud storage
+                    </div>
+                    <div class="tools-list">
+                        <span class="tool-tag">Exiftool</span>
+                        <span class="tool-tag">dnscat2</span>
+                        <span class="tool-tag">rclone</span>
+                        <span class="tool-tag">Cloud storage</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Details Panel -->
+        <div class="details-panel" id="detailsPanel">
+            <div class="details-title" id="detailsTitle">Select a phase for details</div>
+            <div id="detailsContent">
+                <p>Click on any attack phase to see detailed information about techniques, tools, and countermeasures.</p>
+            </div>
+            <div class="countermeasures" id="countermeasures">
+                <div class="counter-title">Defensive Countermeasures</div>
+                <ul class="counter-list" id="counterList">
+                    <li>Implement network segmentation</li>
+                    <li>Deploy EDR solutions</li>
+                    <li>Enable multi-factor authentication</li>
+                    <li>Regular security awareness training</li>
+                </ul>
+            </div>
+            <div class="indicators" id="indicators">
+                <div class="indicators-title">Detection Indicators</div>
+                <ul class="counter-list" id="indicatorList">
+                    <li>Unusual network scanning activity</li>
+                    <li>Failed authentication attempts</li>
+                    <li>Suspicious process creation</li>
+                    <li>Large data transfers</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const phaseElements = document.querySelectorAll('.phase-content');
+            const detailsPanel = document.getElementById('detailsPanel');
+            const detailsTitle = document.getElementById('detailsTitle');
+            const detailsContent = document.getElementById('detailsContent');
+            const countermeasures = document.getElementById('countermeasures');
+            const counterList = document.getElementById('counterList');
+            const indicators = document.getElementById('indicators');
+            const indicatorList = document.getElementById('indicatorList');
+            
+            // Phase details data
+            const phaseDetails = {
+                recon: {
+                    title: "Reconnaissance Phase Details",
+                    description: "The reconnaissance phase involves gathering intelligence about the target before launching an attack. Attackers use both passive and active techniques to collect information about network infrastructure, systems, services, and personnel.",
+                    techniques: [
+                        "Network scanning to identify active hosts and open ports",
+                        "Service enumeration to determine versions and potential vulnerabilities",
+                        "DNS enumeration to map the target's digital footprint",
+                        "Social media and public information gathering (OSINT)",
+                        "Search engine harvesting for exposed documents and information"
+                    ],
+                    countermeasures: [
+                        "Implement network segmentation and firewalls",
+                        "Limit information disclosure in service banners",
+                        "Use DNS monitoring to detect reconnaissance activity",
+                        "Deploy honeypots to distract and identify attackers",
+                        "Conduct regular external penetration tests"
+                    ],
+                    indicators: [
+                        "Multiple port scans from single IP addresses",
+                        "Unusual DNS query patterns",
+                        "Web scraping activity on public-facing sites",
+                        "Increased traffic to non-standard ports",
+                        "Repeated failed login attempts"
+                    ]
+                },
+                initial: {
+                    title: "Initial Access Phase Details",
+                    description: "Initial access is the first step where attackers gain a foothold in the target environment. This is typically achieved through exploitation of vulnerabilities, social engineering, or use of stolen credentials.",
+                    techniques: [
+                        "Phishing campaigns with malicious attachments or links",
+                        "Exploitation of public-facing applications",
+                        "Use of valid accounts through credential theft",
+                        "External remote services like VPN or RDP",
+                        "Supply chain compromise through third-party software"
+                    ],
+                    countermeasures: [
+                        "Implement email filtering and anti-phishing solutions",
+                        "Regular vulnerability scanning and patch management",
+                        "Multi-factor authentication for all external access",
+                        "Application whitelisting and hardening",
+                        "User security awareness training"
+                    ],
+                    indicators: [
+                        "Emails with suspicious attachments or links",
+                        "Unusual authentication patterns or locations",
+                        "Exploit attempts against web applications",
+                        "New scheduled tasks or services",
+                        "Unexpected software installations"
+                    ]
+                },
+                exploit: {
+                    title: "Exploitation Phase Details",
+                    description: "During exploitation, attackers leverage vulnerabilities to execute code on target systems. This phase often involves privilege escalation and credential harvesting to expand control within the environment.",
+                    techniques: [
+                        "Exploitation for privilege escalation",
+                        "OS credential dumping using tools like Mimikatz",
+                        "Exploitation of remote services",
+                        "Process injection and hollowing",
+                        "Abuse of accessibility features"
+                    ],
+                    countermeasures: [
+                        "Regular patching of operating systems and applications",
+                        "Endpoint Detection and Response (EDR) solutions",
+                        "Credential Guard on Windows systems",
+                        "Least privilege principle for user accounts",
+                        "Application control policies"
+                    ],
+                    indicators: [
+                        "Unusual process creation or termination",
+                        "Suspicious registry modifications",
+                        "LSASS memory access attempts",
+                        "Unexpected PowerShell or script execution",
+                        "Privilege escalation attempts"
+                    ]
+                },
+                lateral: {
+                    title: "Lateral Movement Phase Details",
+                    description: "Lateral movement involves techniques that enable attackers to pivot through the network, accessing additional systems and searching for high-value targets such as domain controllers or databases.",
+                    techniques: [
+                        "Pass-the-hash or pass-the-ticket attacks",
+                        "Windows Management Instrumentation (WMI)",
+                        "Remote Desktop Protocol (RDP)",
+                        "SSH hopping between systems",
+                        "Exploitation of SMB shares"
+                    ],
+                    countermeasures: [
+                        "Network segmentation to limit lateral movement",
+                        "Restricted admin mode for RDP",
+                        "Monitoring of authentication events across systems",
+                        "Just-in-time administrative access",
+                        "LAPS (Local Administrator Password Solution)"
+                    ],
+                    indicators: [
+                        "Lateral movement using admin credentials",
+                        "Multiple RDP sessions between systems",
+                        "WMI or PSExec connections to multiple hosts",
+                        "SMB connections to unusual shares",
+                        "Pass-the-hash detection events"
+                    ]
+                },
+                persist: {
+                    title: "Persistence & Command & Control Phase Details",
+                    description: "Attackers establish persistence mechanisms to maintain access to compromised systems and set up command and control channels to communicate with their infrastructure.",
+                    techniques: [
+                        "Scheduled tasks and cron jobs",
+                        "Service creation and modification",
+                        "Registry run keys and startup folders",
+                        "Web shells on compromised servers",
+                        "DNS tunneling for C2 communication"
+                    ],
+                    countermeasures: [
+                        "Monitor for unauthorized scheduled tasks and services",
+                        "Application control and whitelisting",
+                        "Network traffic analysis for C2 patterns",
+                        "DNS filtering and monitoring",
+                        "Regular integrity checks of system files"
+                    ],
+                    indicators: [
+                        "New scheduled tasks or services",
+                        "Unusual network connections to external IPs",
+                        "DNS queries for suspicious domains",
+                        "Modifications to startup locations",
+                        "Web shells in web server directories"
+                    ]
+                },
+                exfil: {
+                    title: "Exfiltration Phase Details",
+                    description: "In the final phase, attackers identify, collect, and transfer sensitive data from the target environment to external systems under their control.",
+                    techniques: [
+                        "Data transfer over commonly allowed protocols (HTTP/S, DNS)",
+                        "Compression and encryption of stolen data",
+                        "Staging data in temporary locations",
+                        "Use of cloud storage for exfiltration",
+                        "Data hiding in images or other files (steganography)"
+                    ],
+                    countermeasures: [
+                        "Data Loss Prevention (DLP) solutions",
+                        "Network monitoring for large data transfers",
+                        "Content filtering and inspection",
+                        "Data classification and access controls",
+                        "Encryption of sensitive data at rest"
+                    ],
+                    indicators: [
+                        "Large outbound data transfers",
+                        "Unusual protocols for data transfer",
+                        "Multiple connections to cloud storage providers",
+                        "Suspicious DNS query volumes",
+                        "Files with hidden data (steganography indicators)"
+                    ]
+                }
+            };
+            
+            // Add click event listeners to each phase
+            phaseElements.forEach(phase => {
+                phase.addEventListener('click', function() {
+                    const phaseType = this.getAttribute('data-phase');
+                    showPhaseDetails(phaseType);
+                });
+            });
+            
+            // Function to display phase details
+            function showPhaseDetails(phaseType) {
+                const details = phaseDetails[phaseType];
+                
+                if (!details) return;
+                
+                // Update the details panel
+                detailsTitle.textContent = details.title;
+                
+                // Build description
+                let contentHTML = `<p>${details.description}</p>`;
+                
+                // Build techniques list
+                contentHTML += `<div class="techniques"><strong>Common Techniques:</strong><ul>`;
+                details.techniques.forEach(technique => {
+                    contentHTML += `<li>${technique}</li>`;
+                });
+                contentHTML += `</ul></div>`;
+                
+                detailsContent.innerHTML = contentHTML;
+                
+                // Build countermeasures list
+                counterList.innerHTML = '';
+                details.countermeasures.forEach(countermeasure => {
+                    const li = document.createElement('li');
+                    li.textContent = countermeasure;
+                    counterList.appendChild(li);
+                });
+                
+                // Build indicators list
+                indicatorList.innerHTML = '';
+                details.indicators.forEach(indicator => {
+                    const li = document.createElement('li');
+                    li.textContent = indicator;
+                    indicatorList.appendChild(li);
+                });
+                
+                // Show the details panel
+                detailsPanel.classList.add('active');
+                
+                // Scroll to details panel
+                detailsPanel.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    </script>
+</body>
+</html>
